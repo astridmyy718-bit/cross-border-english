@@ -248,6 +248,8 @@ const lessons = [
       "Astrid: Can we separate the item value from VAT and duties on the customs invoice? Broker: Yes. According to the current legislation, the customs invoice should reflect only the value of the items in the shipment. VAT and duties should not be included, otherwise taxes may be overpaid. Astrid: What if Customs compares the value with the local market? Broker: Such comparison is not binding. The declared values from the website or APP should prevail, and Customs may request banking proof only if they have doubts.",
     writing:
       "请写一封英文邮件给内部同事，解释为什么 customs invoice value 只应包含商品价值，不应包含 VAT/duties，并说明 CIF、两套 invoice、以及 Customs 可能要求交易证明的情况。",
+    example:
+      "Subject: Clarification on Customs Invoice Value and CIF Calculation\n\nHi team,\n\nI would like to clarify the invoice value to be used for customs purposes in Costa Rica.\n\nAccording to the current process, the customs invoice value should correspond only to the value of the items contained in the shipment. It should not include VAT or the calculation of duties, as doing so may lead to a higher tax payment than required.\n\nPlease also note that the invoice presented to the final customer is separate from the invoice used for customs clearance. The final-customer invoice reflects the product and sales-related costs, while the customs invoice should support the import declaration.\n\nFor tax calculation purposes, the CIF value consists of the product cost, insurance, and freight. In this case, the freight rate has already been calculated based on transportation from origin to destination plus the applicable handling value.\n\nBased on this methodology, separating the values is operationally viable and does not represent a violation of the customs process. If Customs has any doubts, they may request supporting evidence such as proof of banking transaction or a credit card statement, although this is not commonly requested.\n\nBest regards,\nAstrid",
     template: [
       "Open with the purpose of the clarification.",
       "Explain the customs invoice value rule.",
@@ -287,6 +289,11 @@ function getPublishedLabel(lesson) {
   return lesson.publishedAt || "Starter archive";
 }
 
+function getWritingExample(lesson) {
+  if (lesson.example) return lesson.example;
+  return `Subject: ${lesson.title}\n\nHi team,\n\nI would like to share a quick update regarding ${lesson.topic.toLowerCase()}.\n\n${lesson.phrases[0]} ${lesson.phrases[1]}\n\nTo move this forward, please review the required information and confirm the next step. Once we receive the confirmation, we will continue coordinating with the relevant party and provide an update as soon as possible.\n\nBest regards,\nAstrid`;
+}
+
 function lessonKey() {
   const lesson = lessons[currentIndex];
   const id = getPublishedLabel(lesson).replace(/\W+/g, "-").toLowerCase();
@@ -321,6 +328,7 @@ function renderLesson() {
   $("#readingText").textContent = lesson.reading;
   $("#dialogueText").textContent = lesson.dialogue;
   $("#writingPrompt").textContent = lesson.writing;
+  $("#writingExample").textContent = getWritingExample(lesson);
   $("#speakingPrompt").textContent = lesson.speaking;
 
   $("#phraseList").innerHTML = lesson.phrases.map((item) => `<li>${item}</li>`).join("");
@@ -413,6 +421,11 @@ $("#listeningAnswer").addEventListener("input", (event) => {
 $("#saveWriting").addEventListener("click", () => {
   localStorage.setItem(`${lessonKey()}-writing`, $("#writingDraft").value);
   alert("已保存今天的写作练习。");
+});
+
+$("#useExample").addEventListener("click", () => {
+  $("#writingDraft").value = getWritingExample(lessons[currentIndex]);
+  localStorage.setItem(`${lessonKey()}-writing`, $("#writingDraft").value);
 });
 
 $("#startTimer").addEventListener("click", () => {

@@ -279,8 +279,29 @@ textarea:focus {
   background: #fffaf0;
 }
 
+.example-box {
+  margin: 18px 0;
+  padding: 16px;
+  border: 1px solid #b8ded8;
+  border-radius: 8px;
+  background: #f0fbf9;
+}
+
 .template-box h4 {
   margin-bottom: 8px;
+}
+
+.example-box h4 {
+  margin-bottom: 0;
+}
+
+.example-box pre {
+  margin: 14px 0 0;
+  white-space: pre-wrap;
+  color: #263746;
+  font-family: inherit;
+  font-size: 0.96rem;
+  line-height: 1.65;
 }
 
 .template-box ol {
