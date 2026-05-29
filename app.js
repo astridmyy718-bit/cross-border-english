@@ -231,9 +231,42 @@ const lessons = [
       "We expect availability by...",
     ],
   },
+  {
+    publishedAt: "2026-05-29 19:00",
+    topic: "Costa Rica Customs Compliance",
+    title: "Customs invoice value and CIF calculation",
+    reading:
+      "For customs purposes, the invoice value should correspond only to the value of the items contained in the shipment. It should not include VAT or the calculation of duties, because this may result in a higher tax payment than required. The invoice presented to the final customer can be different from the invoice used for customs clearance. In Costa Rica, CIF value generally consists of product cost, insurance, and freight. If the freight rate has already been calculated based on transportation from origin to destination plus handling, it can be explained as part of the customs calculation methodology.",
+    phrases: [
+      "For customs purposes, the invoice value should reflect only the value of the shipped items.",
+      "VAT and duties should not be included in the customs invoice value.",
+      "The final-customer invoice is separate from the invoice used for customs clearance.",
+      "The CIF value consists of product cost, insurance, and freight.",
+      "This calculation methodology is operationally viable under the current process.",
+    ],
+    dialogue:
+      "Astrid: Can we separate the item value from VAT and duties on the customs invoice? Broker: Yes. According to the current legislation, the customs invoice should reflect only the value of the items in the shipment. VAT and duties should not be included, otherwise taxes may be overpaid. Astrid: What if Customs compares the value with the local market? Broker: Such comparison is not binding. The declared values from the website or APP should prevail, and Customs may request banking proof only if they have doubts.",
+    writing:
+      "请写一封英文邮件给内部同事，解释为什么 customs invoice value 只应包含商品价值，不应包含 VAT/duties，并说明 CIF、两套 invoice、以及 Customs 可能要求交易证明的情况。",
+    template: [
+      "Open with the purpose of the clarification.",
+      "Explain the customs invoice value rule.",
+      "Clarify the difference between the final-customer invoice and the customs invoice.",
+      "Define CIF and the freight calculation basis.",
+      "Close with a cautious compliance conclusion.",
+    ],
+    speaking:
+      "Explain to a broker or internal stakeholder why separating product value, VAT, duties, and freight is legal, practical, and aligned with customs calculation methodology.",
+    frames: [
+      "According to the current legislation...",
+      "For customs purposes, we should declare...",
+      "This does not represent a violation of the law because...",
+      "If Customs has any doubts, they may request...",
+    ],
+  },
 ];
 
-let currentIndex = getDailyIndex();
+let currentIndex = getLatestIndex();
 let timerId = null;
 let secondsLeft = 60;
 
@@ -246,9 +279,18 @@ function getDailyIndex() {
   return ((diff % lessons.length) + lessons.length) % lessons.length;
 }
 
+function getLatestIndex() {
+  return lessons.length - 1;
+}
+
+function getPublishedLabel(lesson) {
+  return lesson.publishedAt || "Starter archive";
+}
+
 function lessonKey() {
-  const today = new Date().toISOString().slice(0, 10);
-  return `cb-logistics-english-${today}-${currentIndex}`;
+  const lesson = lessons[currentIndex];
+  const id = getPublishedLabel(lesson).replace(/\W+/g, "-").toLowerCase();
+  return `cb-logistics-english-${id}-${currentIndex}`;
 }
 
 function speak(text) {
@@ -275,6 +317,7 @@ function renderLesson() {
   $("#lessonDay").textContent = `Lesson ${currentIndex + 1}`;
   $("#lessonTopic").textContent = lesson.topic;
   $("#lessonTitle").textContent = lesson.title;
+  $("#lessonPublished").textContent = `更新时间：${getPublishedLabel(lesson)}`;
   $("#readingText").textContent = lesson.reading;
   $("#dialogueText").textContent = lesson.dialogue;
   $("#writingPrompt").textContent = lesson.writing;
@@ -286,6 +329,25 @@ function renderLesson() {
 
   $("#listeningAnswer").value = localStorage.getItem(`${lessonKey()}-listening`) || "";
   $("#writingDraft").value = localStorage.getItem(`${lessonKey()}-writing`) || "";
+}
+
+function renderArchive() {
+  $("#archiveList").innerHTML = lessons
+    .map(
+      (lesson, index) => `
+        <article class="archive-card">
+          <div>
+            <p class="tag">${lesson.topic}</p>
+            <h3>${lesson.title}</h3>
+            <p class="lesson-meta">${getPublishedLabel(lesson)}</p>
+            <p class="muted">${lesson.writing}</p>
+          </div>
+          <button class="small-btn" data-lesson="${index}">复习这课</button>
+        </article>
+      `,
+    )
+    .reverse()
+    .join("");
 }
 
 function renderLibrary() {
@@ -390,6 +452,15 @@ $("#libraryGrid").addEventListener("click", (event) => {
   setView("daily");
 });
 
+$("#archiveList").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-lesson]");
+  if (!button) return;
+  currentIndex = Number(button.dataset.lesson);
+  renderLesson();
+  setView("daily");
+});
+
 renderLesson();
+renderArchive();
 renderLibrary();
 renderProgress();

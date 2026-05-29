@@ -23,6 +23,7 @@
         <button class="nav-item active" data-view="daily">今日课程</button>
         <button class="nav-item" data-view="writing">书面英语</button>
         <button class="nav-item" data-view="speaking">口语表达</button>
+        <button class="nav-item" data-view="archive">历史回顾</button>
         <button class="nav-item" data-view="library">场景库</button>
         <button class="nav-item" data-view="progress">学习记录</button>
       </aside>
@@ -33,6 +34,7 @@
             <div>
               <p class="tag" id="lessonTopic">Customs</p>
               <h2 id="lessonTitle">Loading lesson...</h2>
+              <p class="lesson-meta" id="lessonPublished">Published time</p>
             </div>
             <div class="actions">
               <button class="icon-btn" id="prevLesson" title="上一课" aria-label="上一课">‹</button>
@@ -110,6 +112,16 @@
               <ul id="speakingFrames" class="phrase-list"></ul>
             </article>
           </div>
+        </section>
+
+        <section class="view" id="archive">
+          <div class="lesson-head">
+            <div>
+              <p class="tag">Review Archive</p>
+              <h2>历史课程回顾</h2>
+            </div>
+          </div>
+          <div id="archiveList" class="archive-list"></div>
         </section>
 
         <section class="view" id="library">
