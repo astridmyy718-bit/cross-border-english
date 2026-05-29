@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cross-Border Logistics English Daily</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Daily Business English</p>
+        <h1>跨境物流电商英语练习</h1>
+      </div>
+      <div class="datebox">
+        <span id="todayLabel">Today</span>
+        <strong id="lessonDay">Day 1</strong>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="sidebar" aria-label="学习导航">
+        <button class="nav-item active" data-view="daily">今日课程</button>
+        <button class="nav-item" data-view="writing">书面英语</button>
+        <button class="nav-item" data-view="speaking">口语表达</button>
+        <button class="nav-item" data-view="library">场景库</button>
+        <button class="nav-item" data-view="progress">学习记录</button>
+      </aside>
+
+      <section class="content">
+        <section class="view active" id="daily">
+          <div class="lesson-head">
+            <div>
+              <p class="tag" id="lessonTopic">Customs</p>
+              <h2 id="lessonTitle">Loading lesson...</h2>
+            </div>
+            <div class="actions">
+              <button class="icon-btn" id="prevLesson" title="上一课" aria-label="上一课">‹</button>
+              <button class="icon-btn" id="nextLesson" title="下一课" aria-label="下一课">›</button>
+            </div>
+          </div>
+
+          <div class="study-grid">
+            <article class="panel wide">
+              <div class="panel-title">
+                <h3>阅读材料</h3>
+                <button class="small-btn" id="readArticle">▶ 听全文</button>
+              </div>
+              <p id="readingText" class="reading"></p>
+            </article>
+
+            <article class="panel">
+              <div class="panel-title">
+                <h3>核心表达</h3>
+                <button class="small-btn" id="readPhrases">▶ 跟读</button>
+              </div>
+              <ul id="phraseList" class="phrase-list"></ul>
+            </article>
+
+            <article class="panel">
+              <div class="panel-title">
+                <h3>听力小测</h3>
+                <button class="small-btn" id="playDialogue">▶ 对话</button>
+              </div>
+              <p id="dialogueText" class="dialogue"></p>
+              <label class="answer-label" for="listeningAnswer">听完后写下你听到的关键信息</label>
+              <textarea id="listeningAnswer" rows="4" placeholder="例如：shipment is held because..."></textarea>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="writing">
+          <div class="lesson-head">
+            <div>
+              <p class="tag">Writing Practice</p>
+              <h2>商务邮件与消息改写</h2>
+            </div>
+            <button class="small-btn" id="saveWriting">保存</button>
+          </div>
+          <article class="panel">
+            <h3>今日写作任务</h3>
+            <p id="writingPrompt" class="prompt"></p>
+            <div class="template-box">
+              <h4>可套用结构</h4>
+              <ol id="writingTemplate"></ol>
+            </div>
+            <textarea id="writingDraft" rows="10" placeholder="Write your email or message here..."></textarea>
+          </article>
+        </section>
+
+        <section class="view" id="speaking">
+          <div class="lesson-head">
+            <div>
+              <p class="tag">Speaking Practice</p>
+              <h2>口语场景演练</h2>
+            </div>
+            <button class="small-btn" id="speakPrompt">▶ 播放场景</button>
+          </div>
+          <div class="study-grid">
+            <article class="panel">
+              <h3>角色扮演</h3>
+              <p id="speakingPrompt" class="prompt"></p>
+              <div class="timer">
+                <span id="timerValue">01:00</span>
+                <button class="small-btn" id="startTimer">开始 60 秒</button>
+              </div>
+            </article>
+            <article class="panel">
+              <h3>高频句型</h3>
+              <ul id="speakingFrames" class="phrase-list"></ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="library">
+          <div class="lesson-head">
+            <div>
+              <p class="tag">Scenario Library</p>
+              <h2>跨境物流场景库</h2>
+            </div>
+          </div>
+          <div id="libraryGrid" class="library-grid"></div>
+        </section>
+
+        <section class="view" id="progress">
+          <div class="lesson-head">
+            <div>
+              <p class="tag">Progress</p>
+              <h2>学习记录</h2>
+            </div>
+            <button class="small-btn" id="markDone">标记今日完成</button>
+          </div>
+          <div class="study-grid">
+            <article class="panel">
+              <h3>完成情况</h3>
+              <p class="big-number"><span id="doneCount">0</span> 天</p>
+              <p class="muted" id="doneDates">还没有记录，今天可以开张。</p>
+            </article>
+            <article class="panel">
+              <h3>我的笔记</h3>
+              <textarea id="studyNotes" rows="8" placeholder="记录今天卡住的表达、客户常问句、想背的句子..."></textarea>
+              <button class="small-btn" id="saveNotes">保存笔记</button>
+            </article>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
