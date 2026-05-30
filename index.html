@@ -112,6 +112,8 @@
               <div class="timer">
                 <span id="timerValue">01:00</span>
                 <button class="small-btn" id="startTimer">开始 60 秒</button>
+                <button class="small-btn hidden" id="pauseTimer">暂停</button>
+                <button class="small-btn hidden" id="resetTimer">重置</button>
               </div>
             </article>
             <article class="panel">
@@ -157,8 +159,13 @@
             </article>
             <article class="panel">
               <h3>我的笔记</h3>
-              <textarea id="studyNotes" rows="8" placeholder="记录今天卡住的表达、客户常问句、想背的句子..."></textarea>
-              <button class="small-btn" id="saveNotes">保存笔记</button>
+              <div id="notesDisplay" class="notes-display empty">还没有笔记。点“编辑笔记”记录今天卡住的表达、客户常问句、想背的句子。</div>
+              <textarea id="studyNotes" class="hidden" rows="8" placeholder="记录今天卡住的表达、客户常问句、想背的句子..."></textarea>
+              <div class="note-actions">
+                <button class="small-btn" id="editNotes">编辑笔记</button>
+                <button class="small-btn hidden" id="saveNotes">保存笔记</button>
+                <button class="small-btn hidden" id="cancelNotes">取消</button>
+              </div>
             </article>
           </div>
         </section>

@@ -271,6 +271,32 @@ textarea:focus {
   border-color: var(--blue);
 }
 
+.hidden {
+  display: none !important;
+}
+
+.notes-display {
+  min-height: 170px;
+  padding: 14px;
+  border: 1px solid #c8d7e6;
+  border-radius: 8px;
+  background: #fbfdff;
+  color: #263746;
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+
+.notes-display.empty {
+  color: var(--muted);
+}
+
+.note-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
 .template-box {
   margin: 16px 0;
   padding: 16px;

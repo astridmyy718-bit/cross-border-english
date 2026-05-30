@@ -308,6 +308,7 @@ const lessons = [
 let currentIndex = getLatestIndex();
 let timerId = null;
 let secondsLeft = 60;
+let isTimerPaused = false;
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -412,9 +413,12 @@ function renderLibrary() {
 
 function renderProgress() {
   const done = JSON.parse(localStorage.getItem("cb-logistics-english-done") || "[]");
+  const notes = localStorage.getItem("cb-logistics-english-notes") || "";
   $("#doneCount").textContent = done.length;
   $("#doneDates").textContent = done.length ? done.join("、") : "还没有记录，今天可以开张。";
-  $("#studyNotes").value = localStorage.getItem("cb-logistics-english-notes") || "";
+  $("#studyNotes").value = notes;
+  renderNotesDisplay(notes);
+  setNotesEditing(false);
 }
 
 function setView(viewId) {
@@ -430,6 +434,55 @@ function updateTimer() {
   const minutes = String(Math.floor(secondsLeft / 60)).padStart(2, "0");
   const seconds = String(secondsLeft % 60).padStart(2, "0");
   $("#timerValue").textContent = `${minutes}:${seconds}`;
+}
+
+function setNotesEditing(isEditing) {
+  $("#notesDisplay").classList.toggle("hidden", isEditing);
+  $("#studyNotes").classList.toggle("hidden", !isEditing);
+  $("#editNotes").classList.toggle("hidden", isEditing);
+  $("#saveNotes").classList.toggle("hidden", !isEditing);
+  $("#cancelNotes").classList.toggle("hidden", !isEditing);
+}
+
+function renderNotesDisplay(notes) {
+  const display = $("#notesDisplay");
+  const trimmed = notes.trim();
+  display.textContent =
+    trimmed || "还没有笔记。点“编辑笔记”记录今天卡住的表达、客户常问句、想背的句子。";
+  display.classList.toggle("empty", !trimmed);
+}
+
+function startTimer() {
+  clearInterval(timerId);
+  isTimerPaused = false;
+  $("#pauseTimer").textContent = "暂停";
+  $("#pauseTimer").classList.remove("hidden");
+  $("#resetTimer").classList.remove("hidden");
+  $("#startTimer").textContent = secondsLeft === 60 ? "重新开始" : "重新开始 60 秒";
+  timerId = setInterval(() => {
+    secondsLeft -= 1;
+    updateTimer();
+    if (secondsLeft <= 0) {
+      clearInterval(timerId);
+      timerId = null;
+      secondsLeft = 0;
+      updateTimer();
+      $("#pauseTimer").classList.add("hidden");
+      speak("Time is up. Please summarize your answer in one final sentence.");
+    }
+  }, 1000);
+}
+
+function resetTimer() {
+  clearInterval(timerId);
+  timerId = null;
+  secondsLeft = 60;
+  isTimerPaused = false;
+  updateTimer();
+  $("#startTimer").textContent = "开始 60 秒";
+  $("#pauseTimer").textContent = "暂停";
+  $("#pauseTimer").classList.add("hidden");
+  $("#resetTimer").classList.add("hidden");
 }
 
 document.querySelectorAll(".nav-item").forEach((button) => {
@@ -466,18 +519,23 @@ $("#useExample").addEventListener("click", () => {
 });
 
 $("#startTimer").addEventListener("click", () => {
-  clearInterval(timerId);
   secondsLeft = 60;
   updateTimer();
-  timerId = setInterval(() => {
-    secondsLeft -= 1;
-    updateTimer();
-    if (secondsLeft <= 0) {
-      clearInterval(timerId);
-      speak("Time is up. Please summarize your answer in one final sentence.");
-    }
-  }, 1000);
+  startTimer();
 });
+
+$("#pauseTimer").addEventListener("click", () => {
+  if (!timerId && secondsLeft > 0) {
+    startTimer();
+    return;
+  }
+  clearInterval(timerId);
+  timerId = null;
+  isTimerPaused = !isTimerPaused;
+  $("#pauseTimer").textContent = isTimerPaused ? "继续" : "暂停";
+});
+
+$("#resetTimer").addEventListener("click", resetTimer);
 
 $("#markDone").addEventListener("click", () => {
   const today = new Date().toISOString().slice(0, 10);
@@ -490,8 +548,20 @@ $("#markDone").addEventListener("click", () => {
 });
 
 $("#saveNotes").addEventListener("click", () => {
-  localStorage.setItem("cb-logistics-english-notes", $("#studyNotes").value);
-  alert("笔记已保存。");
+  const notes = $("#studyNotes").value;
+  localStorage.setItem("cb-logistics-english-notes", notes);
+  renderNotesDisplay(notes);
+  setNotesEditing(false);
+});
+
+$("#editNotes").addEventListener("click", () => {
+  setNotesEditing(true);
+  $("#studyNotes").focus();
+});
+
+$("#cancelNotes").addEventListener("click", () => {
+  $("#studyNotes").value = localStorage.getItem("cb-logistics-english-notes") || "";
+  setNotesEditing(false);
 });
 
 $("#libraryGrid").addEventListener("click", (event) => {
