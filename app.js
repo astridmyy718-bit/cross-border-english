@@ -675,6 +675,7 @@ $("#readArticle").addEventListener("click", () => speak(lessons[currentIndex].re
 $("#readPhrases").addEventListener("click", () => speak(lessons[currentIndex].phrases.join(". ")));
 $("#playDialogue").addEventListener("click", () => speak(lessons[currentIndex].dialogue));
 $("#speakPrompt").addEventListener("click", () => speak(lessons[currentIndex].speaking));
+$("#readExample").addEventListener("click", () => speak(getWritingExample(lessons[currentIndex])));
 
 $("#listeningAnswer").addEventListener("input", (event) => {
   localStorage.setItem(`${lessonKey()}-listening`, event.target.value);
