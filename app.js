@@ -346,6 +346,8 @@ let currentIndex = getLatestIndex();
 let timerId = null;
 let secondsLeft = 60;
 let isTimerPaused = false;
+let speechRunId = 0;
+let speechRate = Number(localStorage.getItem("cb-logistics-english-speech-rate") || "0.82");
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -375,17 +377,140 @@ function lessonKey() {
   return `cb-logistics-english-${id}-${currentIndex}`;
 }
 
-function speak(text) {
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function normalizeSpeechText(text) {
+  return text
+    .replace(/\bVAT\b/g, "V A T")
+    .replace(/\bCIF\b/g, "C I F")
+    .replace(/\bHS\b/g, "H S")
+    .replace(/\bDDP\b/g, "D D P")
+    .replace(/\bDAP\b/g, "D A P")
+    .replace(/\bUSD\s*([0-9]+)\.([0-9]+)/g, "U.S. dollars $1 point $2")
+    .replace(/\bAPP\b/g, "app")
+    .replace(/([A-Z][a-z]+):/g, "$1 says:")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function splitForSpeech(text) {
+  const normalized = normalizeSpeechText(text);
+  const sentences = normalized.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [normalized];
+  const chunks = [];
+
+  sentences.forEach((sentence) => {
+    const clean = sentence.trim();
+    if (clean.length <= 145) {
+      chunks.push(clean);
+      return;
+    }
+
+    const parts = clean
+      .split(/,\s+|;\s+|\s+(?=because|while|when|if|although|however|therefore|and we|and the|but the)/i)
+      .map((part) => part.trim())
+      .filter(Boolean);
+
+    let current = "";
+    parts.forEach((part) => {
+      const next = current ? `${current}, ${part}` : part;
+      if (next.length > 145 && current) {
+        chunks.push(current);
+        current = part;
+      } else {
+        current = next;
+      }
+    });
+    if (current) chunks.push(current);
+  });
+
+  return chunks.filter(Boolean);
+}
+
+function getEnglishVoices() {
+  if (!("speechSynthesis" in window)) return [];
+  return window.speechSynthesis
+    .getVoices()
+    .filter((voice) => voice.lang && voice.lang.toLowerCase().startsWith("en"));
+}
+
+function getPreferredVoice() {
+  const voices = getEnglishVoices();
+  const savedVoice = localStorage.getItem("cb-logistics-english-voice");
+  if (savedVoice) {
+    const matched = voices.find((voice) => voice.voiceURI === savedVoice);
+    if (matched) return matched;
+  }
+
+  const preferredNames = ["Samantha", "Ava", "Allison", "Google US English", "Microsoft Aria"];
+  return (
+    voices.find((voice) => preferredNames.some((name) => voice.name.includes(name))) ||
+    voices.find((voice) => voice.lang === "en-US") ||
+    voices.find((voice) => voice.lang === "en-GB") ||
+    voices[0] ||
+    null
+  );
+}
+
+function populateVoices() {
+  const select = $("#voiceSelect");
+  if (!select || !("speechSynthesis" in window)) return;
+  const voices = getEnglishVoices();
+  const preferred = getPreferredVoice();
+  select.innerHTML = voices
+    .map(
+      (voice) =>
+        `<option value="${voice.voiceURI}" ${preferred?.voiceURI === voice.voiceURI ? "selected" : ""}>${voice.name} (${voice.lang})</option>`,
+    )
+    .join("");
+}
+
+function speakChunk(text, runId) {
+  return new Promise((resolve) => {
+    if (runId !== speechRunId) {
+      resolve();
+      return;
+    }
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voice = getPreferredVoice();
+    if (voice) utterance.voice = voice;
+    utterance.lang = voice?.lang || "en-US";
+    utterance.rate = speechRate;
+    utterance.pitch = 1;
+    utterance.onend = resolve;
+    utterance.onerror = resolve;
+    window.speechSynthesis.speak(utterance);
+  });
+}
+
+async function speak(text) {
   if (!("speechSynthesis" in window)) {
     alert("当前浏览器不支持语音播放。可以换 Chrome、Edge 或 Safari 试试。");
     return;
   }
+  speechRunId += 1;
+  const runId = speechRunId;
   window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "en-US";
-  utterance.rate = 0.88;
-  utterance.pitch = 1;
-  window.speechSynthesis.speak(utterance);
+  const chunks = splitForSpeech(text);
+  for (const chunk of chunks) {
+    if (runId !== speechRunId) break;
+    await speakChunk(chunk, runId);
+    await wait(chunk.length > 90 ? 420 : 280);
+  }
+}
+
+function stopSpeech() {
+  speechRunId += 1;
+  if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+}
+
+function setSpeechRate(rate) {
+  speechRate = Number(rate);
+  localStorage.setItem("cb-logistics-english-speech-rate", String(speechRate));
+  document.querySelectorAll(".segment").forEach((button) => {
+    button.classList.toggle("active", Number(button.dataset.rate) === speechRate);
+  });
 }
 
 function renderLesson() {
@@ -526,6 +651,16 @@ document.querySelectorAll(".nav-item").forEach((button) => {
   button.addEventListener("click", () => setView(button.dataset.view));
 });
 
+document.querySelectorAll(".segment").forEach((button) => {
+  button.addEventListener("click", () => setSpeechRate(button.dataset.rate));
+});
+
+$("#voiceSelect").addEventListener("change", (event) => {
+  localStorage.setItem("cb-logistics-english-voice", event.target.value);
+});
+
+$("#stopSpeech").addEventListener("click", stopSpeech);
+
 $("#prevLesson").addEventListener("click", () => {
   currentIndex = (currentIndex - 1 + lessons.length) % lessons.length;
   renderLesson();
@@ -621,3 +756,8 @@ renderLesson();
 renderArchive();
 renderLibrary();
 renderProgress();
+populateVoices();
+setSpeechRate(speechRate);
+if ("speechSynthesis" in window) {
+  window.speechSynthesis.onvoiceschanged = populateVoices;
+}
