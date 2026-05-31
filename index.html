@@ -178,14 +178,16 @@
               <p class="muted" id="doneDates">还没有记录，今天可以开张。</p>
             </article>
             <article class="panel">
-              <h3>我的笔记</h3>
-              <div id="notesDisplay" class="notes-display empty">还没有笔记。点“编辑笔记”记录今天卡住的表达、客户常问句、想背的句子。</div>
+              <h3>今日笔记</h3>
+              <div id="notesDisplay" class="notes-display empty">今天还没有笔记。点“编辑今日笔记”记录今天卡住的表达、客户常问句、想背的句子。</div>
               <textarea id="studyNotes" class="hidden" rows="8" placeholder="记录今天卡住的表达、客户常问句、想背的句子..."></textarea>
               <div class="note-actions">
-                <button class="small-btn" id="editNotes">编辑笔记</button>
+                <button class="small-btn" id="editNotes">编辑今日笔记</button>
                 <button class="small-btn hidden" id="saveNotes">保存笔记</button>
                 <button class="small-btn hidden" id="cancelNotes">取消</button>
               </div>
+              <h3 class="notes-archive-title">笔记回顾</h3>
+              <div id="notesArchive" class="notes-archive"></div>
             </article>
           </div>
         </section>

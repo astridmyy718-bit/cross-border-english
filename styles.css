@@ -343,11 +343,11 @@ textarea:focus {
 }
 
 .notes-display {
-  min-height: 170px;
   padding: 14px;
-  border: 1px solid #c8d7e6;
+  border: 1px solid #d6e4df;
+  border-left: 4px solid var(--teal);
   border-radius: 8px;
-  background: #fbfdff;
+  background: #f7fbfa;
   color: #263746;
   line-height: 1.65;
   white-space: pre-wrap;
@@ -362,6 +362,37 @@ textarea:focus {
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 8px;
+}
+
+.notes-archive-title {
+  margin-top: 22px;
+}
+
+.notes-archive {
+  display: grid;
+  gap: 10px;
+}
+
+.note-card {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.note-card time {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--coral);
+  font-size: 0.88rem;
+  font-weight: 900;
+}
+
+.note-card p {
+  margin-bottom: 0;
+  color: #334155;
+  line-height: 1.6;
+  white-space: pre-wrap;
 }
 
 .template-box {

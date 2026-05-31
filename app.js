@@ -348,6 +348,8 @@ let secondsLeft = 60;
 let isTimerPaused = false;
 let speechRunId = 0;
 let speechRate = Number(localStorage.getItem("cb-logistics-english-speech-rate") || "0.82");
+const NOTES_BY_DATE_KEY = "cb-logistics-english-notes-by-date";
+const LEGACY_NOTES_KEY = "cb-logistics-english-notes";
 
 const $ = (selector) => document.querySelector(selector);
 
@@ -364,6 +366,22 @@ function getLatestIndex() {
 
 function getPublishedLabel(lesson) {
   return lesson.publishedAt || "Starter archive";
+}
+
+function formatLocalDate(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function escapeHtml(value) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 function getWritingExample(lesson) {
@@ -430,9 +448,31 @@ function splitForSpeech(text) {
 
 function getEnglishVoices() {
   if (!("speechSynthesis" in window)) return [];
+  const blockedVoiceNames = [
+    "Albert",
+    "Bad News",
+    "Bahh",
+    "Bells",
+    "Boing",
+    "Bubbles",
+    "Cellos",
+    "Deranged",
+    "Good News",
+    "Hysterical",
+    "Jester",
+    "Organ",
+    "Pipe Organ",
+    "Princess",
+    "Superstar",
+    "Trinoids",
+    "Whisper",
+    "Wobble",
+    "Zarvox",
+  ];
   return window.speechSynthesis
     .getVoices()
-    .filter((voice) => voice.lang && voice.lang.toLowerCase().startsWith("en"));
+    .filter((voice) => voice.lang && voice.lang.toLowerCase().startsWith("en"))
+    .filter((voice) => !blockedVoiceNames.some((name) => voice.name.includes(name)));
 }
 
 function getPreferredVoice() {
@@ -443,7 +483,17 @@ function getPreferredVoice() {
     if (matched) return matched;
   }
 
-  const preferredNames = ["Samantha", "Ava", "Allison", "Google US English", "Microsoft Aria"];
+  const preferredNames = [
+    "Samantha",
+    "Ava",
+    "Allison",
+    "Karen",
+    "Moira",
+    "Daniel",
+    "Google US English",
+    "Microsoft Aria",
+    "Microsoft Jenny",
+  ];
   return (
     voices.find((voice) => preferredNames.some((name) => voice.name.includes(name))) ||
     voices.find((voice) => voice.lang === "en-US") ||
@@ -477,7 +527,7 @@ function speakChunk(text, runId) {
     if (voice) utterance.voice = voice;
     utterance.lang = voice?.lang || "en-US";
     utterance.rate = speechRate;
-    utterance.pitch = 1;
+    utterance.pitch = 0.96;
     utterance.onend = resolve;
     utterance.onerror = resolve;
     window.speechSynthesis.speak(utterance);
@@ -575,11 +625,15 @@ function renderLibrary() {
 
 function renderProgress() {
   const done = JSON.parse(localStorage.getItem("cb-logistics-english-done") || "[]");
-  const notes = localStorage.getItem("cb-logistics-english-notes") || "";
+  migrateLegacyNotes(done);
+  const notesByDate = getNotesByDate();
+  const today = formatLocalDate();
+  const notes = notesByDate[today] || "";
   $("#doneCount").textContent = done.length;
   $("#doneDates").textContent = done.length ? done.join("、") : "还没有记录，今天可以开张。";
   $("#studyNotes").value = notes;
   renderNotesDisplay(notes);
+  renderNotesArchive(notesByDate, today);
   setNotesEditing(false);
 }
 
@@ -610,8 +664,55 @@ function renderNotesDisplay(notes) {
   const display = $("#notesDisplay");
   const trimmed = notes.trim();
   display.textContent =
-    trimmed || "还没有笔记。点“编辑笔记”记录今天卡住的表达、客户常问句、想背的句子。";
+    trimmed || "今天还没有笔记。点“编辑今日笔记”记录今天卡住的表达、客户常问句、想背的句子。";
   display.classList.toggle("empty", !trimmed);
+}
+
+function getNotesByDate() {
+  try {
+    return JSON.parse(localStorage.getItem(NOTES_BY_DATE_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function saveNotesByDate(notesByDate) {
+  localStorage.setItem(NOTES_BY_DATE_KEY, JSON.stringify(notesByDate));
+}
+
+function migrateLegacyNotes(doneDates) {
+  const legacyNotes = localStorage.getItem(LEGACY_NOTES_KEY);
+  if (!legacyNotes || !legacyNotes.trim()) return;
+  const notesByDate = getNotesByDate();
+  if (Object.keys(notesByDate).length) return;
+
+  const firstDoneDate = doneDates[0] || formatLocalDate();
+  notesByDate[firstDoneDate] = legacyNotes;
+  saveNotesByDate(notesByDate);
+  localStorage.removeItem(LEGACY_NOTES_KEY);
+}
+
+function renderNotesArchive(notesByDate, today) {
+  const entries = Object.entries(notesByDate)
+    .filter(([, notes]) => notes.trim())
+    .sort(([dateA], [dateB]) => dateB.localeCompare(dateA));
+
+  if (!entries.length) {
+    $("#notesArchive").innerHTML = `<p class="muted">还没有历史笔记。</p>`;
+    return;
+  }
+
+  $("#notesArchive").innerHTML = entries
+    .map(([date, notes]) => {
+      const label = date === today ? `${date} 今日` : date;
+      return `
+        <article class="note-card">
+          <time>${label}</time>
+          <p>${escapeHtml(notes)}</p>
+        </article>
+      `;
+    })
+    .join("");
 }
 
 function startTimer() {
@@ -711,7 +812,7 @@ $("#pauseTimer").addEventListener("click", () => {
 $("#resetTimer").addEventListener("click", resetTimer);
 
 $("#markDone").addEventListener("click", () => {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = formatLocalDate();
   const done = JSON.parse(localStorage.getItem("cb-logistics-english-done") || "[]");
   if (!done.includes(today)) {
     done.push(today);
@@ -722,8 +823,16 @@ $("#markDone").addEventListener("click", () => {
 
 $("#saveNotes").addEventListener("click", () => {
   const notes = $("#studyNotes").value;
-  localStorage.setItem("cb-logistics-english-notes", notes);
+  const today = formatLocalDate();
+  const notesByDate = getNotesByDate();
+  if (notes.trim()) {
+    notesByDate[today] = notes;
+  } else {
+    delete notesByDate[today];
+  }
+  saveNotesByDate(notesByDate);
   renderNotesDisplay(notes);
+  renderNotesArchive(notesByDate, today);
   setNotesEditing(false);
 });
 
@@ -733,7 +842,8 @@ $("#editNotes").addEventListener("click", () => {
 });
 
 $("#cancelNotes").addEventListener("click", () => {
-  $("#studyNotes").value = localStorage.getItem("cb-logistics-english-notes") || "";
+  const notesByDate = getNotesByDate();
+  $("#studyNotes").value = notesByDate[formatLocalDate()] || "";
   setNotesEditing(false);
 });
 
