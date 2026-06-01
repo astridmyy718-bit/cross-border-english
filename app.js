@@ -340,6 +340,43 @@ const lessons = [
       "This explanation is operationally viable under current legislation, but it is not binding.",
     ],
   },
+  {
+    publishedAt: "2026-06-01 09:20",
+    topic: "Costa Rica Internal and Broker Alignment",
+    title: "Explaining customs invoice logic with cautious compliance wording",
+    reading:
+      "In daily ecommerce operations, teams may need to align internal staff, customs brokers, and customers on why the customs invoice is not always the same as the final sales invoice. For customs purposes, the invoice value should correspond only to the value of the items in the shipment. VAT and duties should not be included in the customs invoice value because this may lead to overpayment of taxes. According to current legislation, it may be operationally viable to keep a separate sales invoice for the final customer and a separate invoice for customs clearance when each document has a different business purpose. The CIF value consists of product cost, insurance, and freight. If a freight rate such as USD 3.75 per kilo already includes transportation from origin to destination plus handling required by Customs, that calculation methodology can be explained with supporting evidence. Customs may conduct market analysis, but the ecommerce website or APP transaction value may still prevail as the declared reference value. If Customs has doubts, they may request proof of banking transaction or a credit card statement, although this may be rare. A customs invoice with the company logo and values in USD can also be valid for customs purposes if it meets the local requirements. Any explanation should remain cautious, practical, and not binding.",
+    phrases: [
+      "For customs purposes, the invoice value should reflect only the item value in the shipment.",
+      "VAT and duties should not be included in the customs invoice value.",
+      "The sales invoice for the final customer can be different from the customs invoice.",
+      "Our CIF calculation methodology includes product cost, insurance, and freight.",
+      "The freight rate of USD 3.75 per kilo already includes transport and Customs-related handling.",
+      "If needed, we can provide supporting evidence for the declared transaction value.",
+    ],
+    dialogue:
+      "Manager: Customs asked why the declared value does not match the customer invoice. Astrid: For customs purposes, we declared only the value of the shipped items, while VAT and duties were excluded. Broker: Can we explain the freight amount in the CIF calculation? Astrid: Yes. The USD 3.75 per kilo rate already includes origin-to-destination transportation and handling required by Customs, and we can share the calculation methodology as supporting evidence. Manager: What if Customs checks the selling price online? Astrid: Customs may conduct market analysis, but the website or APP transaction value may still prevail as the declared reference value under the current process.",
+    writing:
+      "请写一封英文邮件给 customs broker，并抄送内部团队，说明 customs invoice value 为什么只含货值、不含 VAT/duties，为什么可能存在两套 invoice，CIF 和 USD 3.75/kg 的逻辑，以及如果 Customs 有疑问时可提供哪些 supporting evidence。语气要谨慎、合规、not binding。",
+    example:
+      "Subject: Operational Explanation of Customs Invoice Value for Costa Rica Shipment\n\nHi [Broker Name] and team,\n\nI would like to share a brief operational explanation regarding the invoice structure used for this shipment to Costa Rica.\n\nFor customs purposes, the invoice value corresponds only to the value of the items contained in the shipment. VAT and duties are not included in the customs invoice value because including those amounts may result in an overpayment of taxes.\n\nPlease also note that the final-customer sales invoice can be different from the invoice used for customs clearance. These documents serve different purposes. The sales invoice reflects the ecommerce transaction with the customer, while the customs invoice supports the import declaration.\n\nRegarding the customs valuation methodology, the CIF value consists of product cost, insurance, and freight. In this case, the freight rate of USD 3.75 per kilo already includes transportation from origin to destination together with the handling required for Customs processing. According to current legislation, this structure may be operationally viable when the supporting documents remain consistent.\n\nIf Customs has any doubts, we can provide supporting evidence, such as the transaction record, proof of banking transaction, or credit card statement if requested. We also understand that Customs may conduct market analysis; however, the ecommerce website or APP transaction value may remain the declared reference value for this shipment.\n\nThis explanation is provided for operational alignment only and should not be treated as a binding legal opinion.\n\nBest regards,\nAstrid",
+    template: [
+      "State that the note is for operational alignment and customs support.",
+      "Clarify that the customs invoice value covers item value only.",
+      "Explain why the sales invoice and customs invoice may be separate.",
+      "Describe CIF and the USD 3.75 per kilo freight methodology.",
+      "Close with supporting evidence and cautious non-binding wording.",
+    ],
+    speaking:
+      "Practice a 60 to 90 second spoken explanation to a broker or internal teammate about why the customs invoice includes only item value, how two invoices can coexist, how CIF is calculated, and what supporting evidence can be provided if Customs raises questions.",
+    frames: [
+      "For customs purposes, we are declaring only...",
+      "The customer invoice is separate because it is used for...",
+      "Our CIF calculation methodology includes...",
+      "If Customs requests more support, we can provide...",
+      "This explanation is operationally viable according to current legislation, but it is not binding.",
+    ],
+  },
 ];
 
 let currentIndex = getLatestIndex();
